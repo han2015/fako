@@ -101,21 +101,24 @@ func Fuzz(e interface{}) {
 		value := reflect.ValueOf(e).Elem()
 		for i := 0; i < ty.NumField(); i++ {
 			field := value.Field(i)
-
-			if field.CanSet() {
-				fieldType := field.Type().String()
-				if fieldType == "time.Duration" {
-					field.Set(getTimeDurationValue())
-				} else {
-					field.Set(fuzzValueFor(field.Kind()))
-				}
-			}
+			setValueForField(field)
 		}
 
 	}
 }
 
-func getTimeDurationValue() reflect.Value{
+func setValueForField(field reflect.Value) {
+	if field.CanSet() {
+		fieldType := field.Type().String()
+		if fieldType == "time.Duration" {
+			field.Set(randTimeDurationValue())
+		} else {
+			field.Set(fuzzValueFor(field.Kind()))
+		}
+	}
+}
+
+func randTimeDurationValue() reflect.Value{
 	randTime := rand.Int31n(3000)
 	return reflect.ValueOf(time.Duration(randTime) * time.Millisecond)
 }
