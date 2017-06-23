@@ -103,11 +103,21 @@ func Fuzz(e interface{}) {
 			field := value.Field(i)
 
 			if field.CanSet() {
-				field.Set(fuzzValueFor(field.Kind()))
+				fieldType := field.Type().String()
+				if fieldType == "time.Duration" {
+					field.Set(getTimeDurationValue())
+				} else {
+					field.Set(fuzzValueFor(field.Kind()))
+				}
 			}
 		}
 
 	}
+}
+
+func getTimeDurationValue() reflect.Value{
+	randTime := rand.Int31n(3000)
+	return reflect.ValueOf(time.Duration(randTime) * time.Millisecond)
 }
 
 func allGenerators() map[string]func() string {
