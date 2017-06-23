@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"time"
 )
 
 type OU struct {
@@ -62,13 +63,20 @@ func TestCustomGenerator(t *testing.T) {
 }
 
 type Simple struct {
-	Attribute string
-	Value     int
-	Value32   int32
-	Value64   int64
-	ValueF32  float32
-	ValueF64  float64
-	Active    bool
+	Attribute    string
+	Value        int
+	Value32      int32
+	Value64      int64
+	ValueF32     float32
+	ValueF64     float64
+	Active       bool
+	TimeDu       time.Duration
+	StringSlice  []string
+	IntSlice     []int
+	Int32Slice   []int32
+	Int64Slice   []int64
+	Float32Slice []float32
+	Float64Slice []float64
 }
 
 func TestFuzz(t *testing.T) {
@@ -80,6 +88,15 @@ func TestFuzz(t *testing.T) {
 	assert.NotEqual(t, 0, simple.Value64)
 	assert.NotEqual(t, 0.0, simple.ValueF32)
 	assert.NotEqual(t, 0.0, simple.ValueF64)
+
+	assert.NotEqual(t, 0, len(simple.StringSlice))
+	assert.NotEqual(t, "", simple.StringSlice[0])
+
+	assert.NotEqual(t, 0, len(simple.IntSlice))
+	assert.NotEqual(t, 0, len(simple.Int32Slice))
+	assert.NotEqual(t, 0, len(simple.Int64Slice))
+	assert.NotEqual(t, 0, len(simple.Float32Slice))
+	assert.NotEqual(t, 0, len(simple.Float64Slice))
 
 	count := 0
 	for i := 0; i < 10; i++ {

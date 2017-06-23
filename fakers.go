@@ -112,13 +112,15 @@ func setValueForField(field reflect.Value) {
 		fieldType := field.Type().String()
 		if fieldType == "time.Duration" {
 			field.Set(randTimeDurationValue())
+		} else if field.Kind() == reflect.Array || field.Kind() == reflect.Slice {
+			field.Set(randArray(fieldType))
 		} else {
 			field.Set(fuzzValueFor(field.Kind()))
 		}
 	}
 }
 
-func randTimeDurationValue() reflect.Value{
+func randTimeDurationValue() reflect.Value {
 	randTime := rand.Int31n(3000)
 	return reflect.ValueOf(time.Duration(randTime) * time.Millisecond)
 }
@@ -166,6 +168,51 @@ func fuzzValueFor(kind reflect.Kind) reflect.Value {
 	case reflect.Bool:
 		val := r.Intn(2) > 0
 		return reflect.ValueOf(val)
+	}
+
+	return reflect.ValueOf("")
+}
+
+func randArray(fieldType string) reflect.Value {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	numberOfElements := rand.Intn(20)
+	switch fieldType {
+	case "[]string":
+		var data []string
+		for i := 0; i < numberOfElements; i++ {
+			data = append(data, randomString(10))
+		}
+		return reflect.ValueOf(data)
+	case "[]int":
+		var data []int
+		for i := 0; i < numberOfElements; i++ {
+			data = append(data, r.Int())
+		}
+		return reflect.ValueOf(data)
+	case "[]int32":
+		var data []int32
+		for i := 0; i < numberOfElements; i++ {
+			data = append(data, r.Int31())
+		}
+		return reflect.ValueOf(data)
+	case "[]int64":
+		var data []int64
+		for i := 0; i < numberOfElements; i++ {
+			data = append(data, r.Int63())
+		}
+		return reflect.ValueOf(data)
+	case "[]float32":
+		var data []float32
+		for i := 0; i < numberOfElements; i++ {
+			data = append(data, r.Float32())
+		}
+		return reflect.ValueOf(data)
+	case "[]float64":
+		var data []float64
+		for i := 0; i < numberOfElements; i++ {
+			data = append(data, r.Float64())
+		}
+		return reflect.ValueOf(data)
 	}
 
 	return reflect.ValueOf("")
