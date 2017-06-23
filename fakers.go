@@ -110,10 +110,13 @@ func Fuzz(e interface{}) {
 func setValueForField(field reflect.Value) {
 	if field.CanSet() {
 		fieldType := field.Type().String()
+
 		if fieldType == "time.Duration" {
 			field.Set(randTimeDurationValue())
 		} else if field.Kind() == reflect.Array || field.Kind() == reflect.Slice {
 			field.Set(randArray(fieldType))
+		} else if (field.Kind() == reflect.Struct) {
+
 		} else {
 			field.Set(fuzzValueFor(field.Kind()))
 		}

@@ -1,3 +1,8 @@
+### Update:
+* Support time.Duration
+* Support slice for: int, int32, int64, float32, float64
+* Ignore struct type
+
 ### Fako
 
 [![Circle CI](https://circleci.com/gh/wawandco/fako.svg?style=svg)](https://circleci.com/gh/wawandco/fako) [![Godoc](https://img.shields.io/badge/godoc-docs-blue.svg)](https://godoc.org/github.com/wawandco/fako)
