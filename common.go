@@ -23,3 +23,13 @@ func randomString(strlen int) string {
 	}
 	return string(result)
 }
+
+func strInArray(needle string, haystack []string) bool{
+	for _, item := range haystack {
+		if item == needle {
+			return true
+		}
+	}
+
+	return false
+}
