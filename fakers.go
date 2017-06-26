@@ -81,6 +81,15 @@ var typeMapping = map[string]func() string{
 	"Zip":                      fake.Zip,
 }
 
+var validArrayTypes = []string{
+	"[]string",
+	"[]int",
+	"[]int32",
+	"[]int64",
+	"[]float32",
+	"[]float64",
+}
+
 // Register allows user to add his own data generators for special cases
 // that we could not cover with the generators that fako includes by default.
 func Register(identifier string, generator func() string) {
@@ -110,13 +119,15 @@ func Fuzz(e interface{}) {
 func setValueForField(field reflect.Value) {
 	if field.CanSet() {
 		fieldType := field.Type().String()
-
 		if fieldType == "time.Duration" {
 			field.Set(randTimeDurationValue())
 		} else if field.Kind() == reflect.Array || field.Kind() == reflect.Slice {
-			field.Set(randArray(fieldType))
-		} else if (field.Kind() == reflect.Struct) {
-
+			//Not support struct array
+			if strInArray(fieldType, validArrayTypes) {
+				field.Set(randArray(fieldType))
+			}
+		} else if field.Kind() == reflect.Struct {
+			//TODO: support struct type
 		} else {
 			field.Set(fuzzValueFor(field.Kind()))
 		}

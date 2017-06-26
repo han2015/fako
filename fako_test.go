@@ -77,6 +77,12 @@ type Simple struct {
 	Int64Slice   []int64
 	Float32Slice []float32
 	Float64Slice []float64
+	Childs       []SimpleChild
+}
+
+type SimpleChild struct {
+	Id   string
+	Name string
 }
 
 func TestFuzz(t *testing.T) {
