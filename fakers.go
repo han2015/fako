@@ -7,6 +7,7 @@ import (
 
 	"github.com/icrowley/fake"
 	"github.com/serenize/snaker"
+	"math"
 )
 
 var customGenerators = map[string]func() string{}
@@ -170,7 +171,7 @@ func fuzzValueFor(kind reflect.Kind) reflect.Value {
 	case reflect.String:
 		return reflect.ValueOf(randomString(25))
 	case reflect.Int:
-		return reflect.ValueOf(r.Int())
+		return reflect.ValueOf(r.Intn(math.MaxInt32))
 	case reflect.Int32:
 		return reflect.ValueOf(r.Int31())
 	case reflect.Int64:
