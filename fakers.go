@@ -1,7 +1,6 @@
 package fako
 
 import (
-	"fmt"
 	"math/rand"
 	"reflect"
 	"strings"
@@ -111,13 +110,11 @@ func Fuzz(e interface{}) {
 	}
 
 	if ty.Kind() == reflect.Struct {
-		fmt.Println(ty.Name())
 		value := reflect.ValueOf(e).Elem()
 		for i := 0; i < ty.NumField(); i++ {
 			field := value.Field(i)
 			setValueForField(field)
 		}
-
 	}
 }
 
@@ -137,7 +134,20 @@ func setValueForField(field reflect.Value) {
 			//Not support struct array
 			if strInArray(fieldType, validArrayTypes) {
 				field.Set(randArray(fieldType))
+				return
 			}
+			//TODO: to support struct array
+			//the default length of fake slice is 6
+			structs := reflect.MakeSlice(field.Type(), 0, 6)
+			_struct := reflect.TypeOf(field.Interface()).Elem()
+
+			for i := 0; i < 6; i++ {
+				_field := reflect.New(_struct)
+				Fuzz(_field.Interface())
+				structs = reflect.Append(structs, reflect.Indirect(_field))
+			}
+
+			field.Set(reflect.Indirect(structs))
 		} else if field.Kind() == reflect.Struct {
 			_field := reflect.New(field.Type())
 			Fuzz(_field.Interface())
