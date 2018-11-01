@@ -153,7 +153,13 @@ func setValueForField(field reflect.Value) {
 			Fuzz(_field.Interface())
 			field.Set(reflect.Indirect(_field))
 		} else {
-			field.Set(fuzzValueFor(field.Kind()))
+			_type := field.Type().Name()
+			if _type == field.Kind().String() {
+				field.Set(fuzzValueFor(field.Kind()))
+				return
+			}
+			//to fix string alias: e.g json.Number
+			field.Set(fuzzValueFor(field.Kind()).Convert(field.Type()))
 		}
 	}
 }
