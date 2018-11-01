@@ -109,6 +109,20 @@ func Fuzz(e interface{}) {
 		ty = ty.Elem()
 	}
 
+	if ty.Kind() == reflect.Slice {
+		structs := reflect.MakeSlice(ty, 0, 3)
+		_struct := ty.Elem()
+
+		for i := 0; i < 3; i++ {
+			_field := reflect.New(_struct)
+			Fuzz(_field.Interface())
+			structs = reflect.Append(structs, reflect.Indirect(_field))
+		}
+
+		reflect.ValueOf(e).Elem().Set(reflect.Indirect(structs))
+		return
+	}
+
 	if ty.Kind() == reflect.Struct {
 		value := reflect.ValueOf(e).Elem()
 		for i := 0; i < ty.NumField(); i++ {
@@ -136,18 +150,11 @@ func setValueForField(field reflect.Value) {
 				field.Set(randArray(fieldType))
 				return
 			}
+
 			//TODO: to support struct array
-			//the default length of fake slice is 6
-			structs := reflect.MakeSlice(field.Type(), 0, 6)
-			_struct := reflect.TypeOf(field.Interface()).Elem()
-
-			for i := 0; i < 6; i++ {
-				_field := reflect.New(_struct)
-				Fuzz(_field.Interface())
-				structs = reflect.Append(structs, reflect.Indirect(_field))
-			}
-
-			field.Set(reflect.Indirect(structs))
+			_field := reflect.New(field.Type())
+			Fuzz(_field.Interface())
+			field.Set(reflect.Indirect(_field))
 		} else if field.Kind() == reflect.Struct {
 			_field := reflect.New(field.Type())
 			Fuzz(_field.Interface())
