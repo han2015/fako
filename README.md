@@ -1,3 +1,12 @@
+ ### Nov 1, 2018 Update:
+  * Support time.Time & *time.Time
+  * Support struct type & slice
+  * Support support fuzz []struct directly
+
+  **Maybe** about array& map, shouldn't use in struct frequently, not rational.
+
+
+
 ### Update:
 * Support time.Duration
 * Support slice for: int, int32, int64, float32, float64
