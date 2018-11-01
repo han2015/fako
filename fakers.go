@@ -1,13 +1,16 @@
 package fako
 
 import (
+	"fmt"
 	"math/rand"
 	"reflect"
+	"strings"
 	"time"
+
+	"math"
 
 	"github.com/icrowley/fake"
 	"github.com/serenize/snaker"
-	"math"
 )
 
 var customGenerators = map[string]func() string{}
@@ -108,6 +111,7 @@ func Fuzz(e interface{}) {
 	}
 
 	if ty.Kind() == reflect.Struct {
+		fmt.Println(ty.Name())
 		value := reflect.ValueOf(e).Elem()
 		for i := 0; i < ty.NumField(); i++ {
 			field := value.Field(i)
@@ -122,13 +126,22 @@ func setValueForField(field reflect.Value) {
 		fieldType := field.Type().String()
 		if fieldType == "time.Duration" {
 			field.Set(randTimeDurationValue())
+		} else if strings.Contains(fieldType, "Time") {
+			ft := time.Now().Add(time.Duration(rand.Int63()))
+			if strings.HasPrefix(fieldType, "*") {
+				field.Set(reflect.ValueOf(&ft))
+			} else {
+				field.Set(reflect.ValueOf(ft))
+			}
 		} else if field.Kind() == reflect.Array || field.Kind() == reflect.Slice {
 			//Not support struct array
 			if strInArray(fieldType, validArrayTypes) {
 				field.Set(randArray(fieldType))
 			}
 		} else if field.Kind() == reflect.Struct {
-			//TODO: support struct type
+			_field := reflect.New(field.Type())
+			Fuzz(_field.Interface())
+			field.Set(reflect.Indirect(_field))
 		} else {
 			field.Set(fuzzValueFor(field.Kind()))
 		}
@@ -180,6 +193,16 @@ func fuzzValueFor(kind reflect.Kind) reflect.Value {
 		return reflect.ValueOf(r.Float32())
 	case reflect.Float64:
 		return reflect.ValueOf(r.Float64())
+	case reflect.Uint:
+		return reflect.ValueOf(uint(r.Uint32()))
+	case reflect.Uint8:
+		return reflect.ValueOf(uint8(r.Uint32()))
+	case reflect.Uint16:
+		return reflect.ValueOf(uint16(r.Uint32()))
+	case reflect.Uint32:
+		return reflect.ValueOf(r.Uint32())
+	case reflect.Uint64:
+		return reflect.ValueOf(r.Uint64())
 	case reflect.Bool:
 		val := r.Intn(2) > 0
 		return reflect.ValueOf(val)
